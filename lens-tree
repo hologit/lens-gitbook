@@ -1,0 +1,30 @@
+#!/bin/bash -e
+
+INPUT_TREE="${1?<input> required}"
+
+# redirect all output to stderr
+{
+  # export git tree to disk
+  git holo lens export-tree "${INPUT_TREE}"
+
+  # execute compilation
+  pushd "${GIT_WORK_TREE}" > /dev/null
+  build-book
+  build_status=$?
+  popd > /dev/null
+
+  # process result
+  if [ $build_status -ne 0 ]; then
+    echo -e "\ngitbook build failed with exit status ${build_status}"
+    exit
+  fi
+
+  echo -e "\ngitbook build completed successfully"
+
+  # add output to git index
+  git add -f "_book"
+
+} 1>&2
+
+# output tree hash
+git write-tree --prefix="_book"

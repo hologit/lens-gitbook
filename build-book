@@ -1,0 +1,4 @@
+#!/bin/bash -e
+
+gitbook install
+gitbook build
